@@ -1,0 +1,2351 @@
+{
+  "name": "CV Automation System",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "has:attachment (subject:(CV OR Resume) OR body:(CV OR Resume) OR filename:(CV OR Resume))"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        1008
+      ],
+      "id": "3f09929c-c1a6-448b-bd98-905e87b8e53a",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Yyj2Hr7r3ctVPUD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        656,
+        992
+      ],
+      "id": "22a0d6ea-8992-4e95-bb6e-d59783bf216c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "name": "={{ $json.CV.Name }} - CV",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json['CVs Folder ID'] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2768,
+        848
+      ],
+      "id": "9a5a88fb-a0a5-4ed1-85b1-a4ba7f6cee1b",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xJPJagsQIKXc95f5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $now.format('yyyy-MM-dd') }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1UwQz7QO8tHI3u7A8TDDIhEUeojlGtF5J",
+          "mode": "list",
+          "cachedResultName": "Daily Reports",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1UwQz7QO8tHI3u7A8TDDIhEUeojlGtF5J"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        432,
+        496
+      ],
+      "id": "7c246329-b0e4-44e3-b5c9-14fb8402f5e6",
+      "name": "Create Today Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xJPJagsQIKXc95f5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "CVs",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        496
+      ],
+      "id": "22871502-fad8-4103-a555-1e3086fcbf0f",
+      "name": "Create CVs Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xJPJagsQIKXc95f5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get Today Files IDs').item.json['Spreadsheet ID'] }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SAcOIcozn8HeHl6x1fNLlXJ3XWSh1_JWRbYfiD3i0f0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Merge With IDs').item.json.CV.Name }}",
+            "Phone": "='{{ $('Merge With IDs').item.json.CV.Phone }}",
+            "Email": "={{ $('Merge With IDs').item.json.CV.Email }}",
+            "Title": "={{ $('Merge With IDs').item.json.CV.Title }}",
+            "Best Vacancy": "={{ $('Merge With IDs').item.json.CV['Best Vacancy'] }}",
+            "Score": "={{ $('Merge With IDs').item.json.CV.Score }}",
+            "Summary Review": "={{ $('Merge With IDs').item.json.CV['Summary Review'] }}",
+            "CV Link": "={{ $json.webViewLink }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Best Vacancy",
+              "displayName": "Best Vacancy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary Review",
+              "displayName": "Summary Review",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CV Link",
+              "displayName": "CV Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2960,
+        848
+      ],
+      "id": "0686f28a-07cd-4433-8b6d-f6f34da42e03",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        1856
+      ],
+      "id": "70b177a7-974a-49bb-a93f-5f46ecde8028",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2112,
+        832
+      ],
+      "id": "5fd6ddbb-8cc1-48c7-8aaa-cdf831210b86",
+      "name": "Merge CV with Data"
+    },
+    {
+      "parameters": {
+        "content": "# Get IDs",
+        "height": 624,
+        "width": 448,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2272,
+        736
+      ],
+      "id": "b1f6ac94-9967-4c73-a86d-826c6001e0c8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Get New CV Emails",
+        "height": 624,
+        "width": 464,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        736
+      ],
+      "id": "cc7338f3-eeee-4bc2-be84-65f892378d19",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Extract Data From CV",
+        "height": 624,
+        "width": 1776,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        496,
+        736
+      ],
+      "id": "c6601771-a9e8-4c89-b865-086c9bb83482",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Upload CVs and Data",
+        "height": 624,
+        "width": 784,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        736
+      ],
+      "id": "18161521-eec6-49d5-812f-f5d8ae31b421",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Send Email to Manager",
+        "height": 288,
+        "width": 432,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        1728
+      ],
+      "id": "c8baeb7e-00d6-423b-b2ec-bf6413a89506",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M",
+          "mode": "list",
+          "cachedResultName": "Daily Reports Files IDs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.format('yyyy-MM-dd') }}",
+            "Spreadsheet ID": "={{ $('Create CVs Spreadsheet').item.json.spreadsheetId }}",
+            "Day Folder ID": "={{ $('Create Today Folder').item.json.id }}",
+            "CVs Folder ID": "={{ $('Create CVs Folder').item.json.id }}",
+            "Need to Review Folder ID": "={{ $('Create Need to Review Folder').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Day Folder ID",
+              "displayName": "Day Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CVs Folder ID",
+              "displayName": "CVs Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Need to Review Folder ID",
+              "displayName": "Need to Review Folder ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Spreadsheet ID",
+              "displayName": "Spreadsheet ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1888,
+        496
+      ],
+      "id": "78ee86ac-1256-4d0b-928c-a5846150bd6d",
+      "name": "Append to Files IDs Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Start every day on 12 midnight",
+        "height": 288,
+        "width": 336,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "573e00ae-1be2-4b48-a2a2-735d2083ad87",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        496
+      ],
+      "id": "6b65adaf-9bd5-4b4b-8cec-e6cfe4c7b3a1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# Create Folders Structure",
+        "height": 288,
+        "width": 704,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        384
+      ],
+      "id": "8321e29e-788a-434d-9716-5c5bfbd36eee",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# Create and Format Spreadsheet",
+        "height": 288,
+        "width": 736,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        384
+      ],
+      "id": "80ec1cea-162d-4765-81a5-8b6fbe20a920",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Add to Database",
+        "height": 288,
+        "width": 326,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1808,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "6934f64c-3113-4ebe-9490-1dde3128a824",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Name",
+              "description": "Candidate Name"
+            },
+            {
+              "name": "Phone",
+              "description": "Candidate Phone Number"
+            },
+            {
+              "name": "Email",
+              "description": "Candidate Email"
+            },
+            {
+              "name": "Title",
+              "description": "Candidate Job title"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert extraction algorithm.\nOnly extract relevant information from the CV/Resume.\nIf you do not know the value of an attribute asked to extract, you may omit the attribute's value."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        1136,
+        992
+      ],
+      "id": "d5865bdf-6aaa-40cd-9e24-9314da95ea66",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        1216
+      ],
+      "id": "b61b2599-892d-4121-ad67-cf9e6e2faeff",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "QZSKNCFELLYhDFyZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<Vacancies>\n{{ $json.content }}\n</Vacancies>\n\n<CV>\n{{ $('Text Content').item.json.text }}\n</CV>",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "based on the CV. Extract the name of the best vacancy, give score from 0-100%, and give a 100 words summary review about how this candidate fits the vacancy.\nuse json format \"Best Vacancy\", \"Score\" and \"Summary Review\""
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1616,
+        992
+      ],
+      "id": "bc915409-0a6d-438e-bacf-8791a442c94e",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1OfuI8-aLnoXrbDaMpDAN9xbqcHezi9NMxrZlyWRMJYY/edit?usp=drive_link"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        992
+      ],
+      "id": "7dce8380-805c-4ae8-8e9b-1afbee20b073",
+      "name": "Get a Vacancies",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "6vfc5Y3h6ch7kdOi",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Best Vacancy\": \"\",\n    \"Score\": \"\",\n    \"Summary Review\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1792,
+        1216
+      ],
+      "id": "556ae7d3-d3ef-4006-9bf4-dd157b86e885",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "01d67d38-3fda-4c4a-af85-3f4c385dca80",
+              "name": "CV.Name",
+              "value": "={{ $('Information Extractor').item.json.output.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "f1ebf4ed-d779-43e2-85fd-0441b0f93ded",
+              "name": "CV.Phone",
+              "value": "={{ $('Information Extractor').item.json.output.Phone }}",
+              "type": "string"
+            },
+            {
+              "id": "aacf8f42-6df3-401d-a404-986a6ece3dee",
+              "name": "CV.Email",
+              "value": "={{ $('Information Extractor').item.json.output.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "4fc20ec1-2d6e-4c35-8826-e8b91bc53cab",
+              "name": "CV.Title",
+              "value": "={{ $('Information Extractor').item.json.output.Title }}",
+              "type": "string"
+            },
+            {
+              "id": "b3b61d69-7509-4c01-a21c-93091bd573bc",
+              "name": "CV['Best Vacancy']",
+              "value": "={{ $json.output['Best Vacancy'] }}",
+              "type": "string"
+            },
+            {
+              "id": "c7539a55-5ecf-46d9-9a9a-0982f1b9343b",
+              "name": "CV.Score",
+              "value": "={{ $json.output.Score }}",
+              "type": "string"
+            },
+            {
+              "id": "90b860aa-9552-44cd-bbdb-9f6224dffa0e",
+              "name": "CV['Summary Review']",
+              "value": "={{ $json.output['Summary Review'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        992
+      ],
+      "id": "ca7bd5e8-1ce2-4626-8e1f-2458c9ade76d",
+      "name": "Extracted Data"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kTZT3swcuNsyQ5_IkUl46Oy0wbPBUv3CA8HWRWRrgl8",
+          "mode": "list",
+          "cachedResultName": "All CVs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kTZT3swcuNsyQ5_IkUl46Oy0wbPBUv3CA8HWRWRrgl8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kTZT3swcuNsyQ5_IkUl46Oy0wbPBUv3CA8HWRWRrgl8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "=  {{ $now.format('yyyy-MM-dd') }}",
+            "Name": "={{ $('Merge With IDs').item.json.CV.Name }}",
+            "Phone": "='{{ $('Merge With IDs').item.json.CV.Phone }}",
+            "Email": "={{ $('Merge With IDs').item.json.CV.Email }}",
+            "Title": "={{ $('Merge With IDs').item.json.CV.Title }}",
+            "Best Vacancy": "={{ $('Merge With IDs').item.json.CV['Best Vacancy'] }}",
+            "Score": "={{ $('Merge With IDs').item.json.CV.Score }}",
+            "Summary Review": "={{ $('Merge With IDs').item.json.CV['Summary Review'] }}",
+            "CV Link": "={{ $('Upload file').item.json.webViewLink }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Best Vacancy",
+              "displayName": "Best Vacancy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary Review",
+              "displayName": "Summary Review",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV Link",
+              "displayName": "CV Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3344,
+        848
+      ],
+      "id": "27fdf280-cf67-44cf-b3da-9872e14a48c5",
+      "name": "Append to CVs Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $('Merge With IDs').item.json['Spreadsheet ID'] }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"requests\": [\n    {\n      \"autoResizeDimensions\": {\n        \"dimensions\": {\n          \"dimension\": \"COLUMNS\",\n          \"endIndex\": 5\n        }\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3152,
+        848
+      ],
+      "id": "4e47485c-71b2-4e3d-8e1d-3589a8d3506d",
+      "name": "Format Row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 23,
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        1856
+      ],
+      "id": "bbb6ad28-2240-406a-953f-754a7b323fea",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get Today Files IDs1').item.json['Spreadsheet ID'] }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hhEfM6gFvGl3wFmT7yvAKoMd--I5yWIVPh-wIuaDFfk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1248,
+        1856
+      ],
+      "id": "d83ae8f8-9024-44cd-8b9a-4541f5287928",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M",
+          "mode": "list",
+          "cachedResultName": "Daily Reports Files IDs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $now.format('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        1856
+      ],
+      "id": "2bbed0d0-aff9-4cf6-b699-7ebdb273fdbc",
+      "name": "Get Today Files IDs1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create Today Report Spreadsheet').item.json.spreadsheetId }}"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Get Today Files IDs1').item.json['Day Folder ID'] }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        832,
+        1856
+      ],
+      "id": "4f486902-cdfc-4c1a-81a8-3cd74a332339",
+      "name": "Move Spreadsheet to Today Folder1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xJPJagsQIKXc95f5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create Today Report Spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gkxAiYHnEb0QBRQqvygfUZCsgpDZ10ROj62esPB9IRs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Phone": "='{{ $json.Phone }}",
+            "Email": "={{ $json.Email }}",
+            "Title": "={{ $json.Title }}",
+            "Best Vacancy": "={{ $json['Best Vacancy'] }}",
+            "Score": "={{ $json.Score }}",
+            "Summary Review": "={{ $json['Summary Review'] }}",
+            "CV Link": "={{ $json['CV Link'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Best Vacancy",
+              "displayName": "Best Vacancy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary Review",
+              "displayName": "Summary Review",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV Link",
+              "displayName": "CV Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1664,
+        1856
+      ],
+      "id": "90e173df-ce30-4027-92fa-c97e7d790feb",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Start every day before day end",
+        "height": 288,
+        "width": 336,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        1728
+      ],
+      "typeVersion": 1,
+      "id": "17b15cbb-4616-4b13-b746-bdd74d61170a",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "# Get IDs",
+        "height": 288,
+        "width": 192,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        1728
+      ],
+      "id": "1d6b50e6-3e84-4ab9-9eb2-59230ee065d7",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "# Create and Format Spreadsheet",
+        "height": 288,
+        "width": 608,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        560,
+        1728
+      ],
+      "id": "be25a3a8-8481-47b0-b3ca-bcdf48e671d8",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "# Get and Filter Data",
+        "height": 288,
+        "width": 656
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1168,
+        1728
+      ],
+      "typeVersion": 1,
+      "id": "33c7d15d-ec97-408e-b7fb-6a2337e21d42",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2576,
+        848
+      ],
+      "id": "670346ca-91df-4e09-ae67-d90604571d35",
+      "name": "Merge With IDs"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $input.item.binary.attachment_0.fileExtension }}",
+                    "rightValue": "pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "849002e3-1c21-45c8-ad8a-1fda06cbc6e9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PDF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2e3ccb4d-a00d-4708-8920-92627c6a5ad9",
+                    "leftValue": "={{ $input.item.binary.attachment_0.fileExtension }}",
+                    "rightValue": "docx",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Microsoft Word"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        304,
+        992
+      ],
+      "id": "753d5a7f-173b-486b-8801-b0e4039e7a5b",
+      "name": "Switch - File Type"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        656,
+        816
+      ],
+      "id": "64aef8c7-5fb2-4237-a69d-45f7d4bba1a8",
+      "name": "Do Nothing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "67449844-2230-4184-92c7-7321e622a24e",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        992
+      ],
+      "id": "450fe1c5-8ef6-44dc-8006-1ee34c70efc8",
+      "name": "Text Content"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M",
+          "mode": "list",
+          "cachedResultName": "Daily Reports Files IDs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $now.format('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2368,
+        912
+      ],
+      "id": "25b4f92d-d8d4-47a7-a933-b7b0f4b792f7",
+      "name": "Get Today Files IDs",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "Need to Review",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create Today Folder').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        896,
+        496
+      ],
+      "id": "e8f84fb6-4dbe-44cb-bdea-71090e00f329",
+      "name": "Create Need to Review Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xJPJagsQIKXc95f5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputBinaryField": "attachment_0"
+      },
+      "type": "n8n-nodes-docx-converter.docxToText",
+      "typeVersion": 1,
+      "position": [
+        656,
+        1216
+      ],
+      "id": "2e747b6d-966b-49a0-8887-75f978ef89a2",
+      "name": "DOCX to Text"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M",
+          "mode": "list",
+          "cachedResultName": "Daily Reports Files IDs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FlC6QaPgpdmJrglxbWb_Pzu4KpIaiIc2mFrP92bGa4M/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ $now.format('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        128,
+        1472
+      ],
+      "id": "850b6cb2-7e09-40d9-9d2c-dfb5f70ef635",
+      "name": "Get Today Files IDs2",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "name": "={{ $input.item.binary.attachment_0.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json['Need to Review Folder ID'] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        512,
+        1456
+      ],
+      "id": "39ddceb0-4ec9-421e-be82-ca3de80c57f3",
+      "name": "Upload to Need to Review",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xJPJagsQIKXc95f5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        336,
+        1456
+      ],
+      "id": "14170a86-d0a1-419f-8a29-67c97845b2eb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sendTo": "mohammedadellma224@gmail.com",
+        "subject": "A CV/Resume Needs for Review",
+        "message": "=<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>CV/Resume Received</title>\n  <style>\n    @media only screen and (max-width: 620px) {\n      .container { width: 100% !important; padding: 16px !important; }\n      .content { padding: 18px !important; }\n      .btn { display:block !important; width:100% !important; text-align:center !important; }\n    }\n    .preheader { display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; }\n  </style>\n</head>\n<body style=\"margin:0; padding:0; background-color:#f2f4f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n\n  <!-- Preheader -->\n  <div class=\"preheader\">A new CV/Resume has been received and needs for review.</div>\n\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background-color:#f2f4f7; padding:24px 0;\">\n    <tr>\n      <td align=\"center\">\n\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"container\" style=\"width:600px; max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.08);\">\n          \n          <!-- Header -->\n          <tr>\n            <td style=\"padding:20px 24px; background: linear-gradient(90deg,#0f62fe 0%, #2bb673 100%); color:#ffffff;\">\n              <h1 style=\"margin:0; font-size:20px; font-weight:600;\">CV/Resume Notification</h1>\n              <div style=\"margin-top:6px; font-size:13px; opacity:0.95;\">A candidate CV/Resume needs for review</div>\n            </td>\n          </tr>\n\n          <!-- Content -->\n          <tr>\n            <td class=\"content\" style=\"padding:20px 24px;\">\n              <p style=\"margin:0; font-size:15px; color:#111827;\">Hello HR,</p>\n              <p style=\"margin:12px 0 20px 0; font-size:15px; color:#374151;\">\n                A CV/Resume has been received and needs for your review.\n              </p>\n\n              <!-- Button -->\n              <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\" style=\"margin-bottom:20px;\">\n                <tr>\n                  <td>\n                    <a href=\"{{ $json.webViewLink }}\" class=\"btn\" \n                       style=\"display:inline-block; padding:12px 22px; background:#0f62fe; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:600; font-size:15px;\">\n                      View File\n                    </a>\n                  </td>\n                </tr>\n              </table>\n\n              <p style=\"margin:0; font-size:14px; color:#334155;\">\n                Please review the file at your convenience.\n              </p>\n            </td>\n          </tr>\n\n          <!-- Footer -->\n          <tr>\n            <td style=\"padding:14px 24px; background:#fbfdff; border-top:1px solid #eef2f7; font-size:13px; color:#64748b;\">\n              <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr>\n                  <td>\n                    Thanks for your time,<br>\n                    <strong style=\"color:#0f1724;\">CV Automation Bot</strong>\n                  </td>\n                  <td align=\"right\" style=\"font-size:12px; color:#94a3b8;\">\n                    © <span id=\"year\">2025</span> Company Name\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "CV Automation System"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        736,
+        1456
+      ],
+      "id": "ef196321-ea2d-4417-9141-46d013e91bf7",
+      "name": "Send a message1",
+      "webhookId": "e515aa04-bfda-430b-b408-b97f41124c2c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Yyj2Hr7r3ctVPUD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4904514097001688622"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        944,
+        1456
+      ],
+      "id": "6721625b-1594-4431-9ddc-d2b088304870",
+      "name": "Add label to message",
+      "webhookId": "a870a282-7ad7-44b2-9d59-34fe1e538bb3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Yyj2Hr7r3ctVPUD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d65c01cf-26e2-4778-811c-2bf8fd443c25",
+              "leftValue": "={{ $('Merge With IDs').item.json.CV.Score.replace('%', '').toNumber() }}",
+              "rightValue": 90,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3552,
+        848
+      ],
+      "id": "e9b1e186-6e12-4591-9b86-37d39c44e41b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "mohammedadellma224@gmail.com",
+        "subject": "= Candidate Shortlist — {{ $json['Best Vacancy'] }}",
+        "message": "=<!-- Copy everything between the lines and paste into your email editor's HTML source -->\n<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>Candidate: {{ $('Merge With IDs').item.json.CV.Name }} — {{ $('Merge With IDs').item.json.CV['Best Vacancy'] }}</title>\n  <style>\n    /* Some clients support this; important styles are also inlined below. */\n    @media only screen and (max-width: 620px) {\n      .container { width: 100% !important; padding: 16px !important; }\n      .content { padding: 18px !important; }\n      .two-col { display:block !important; width:100% !important; }\n      .score-badge { font-size: 18px !important; padding: 10px 14px !important; }\n    }\n    /* Hide preheader text visually but keep for inbox preview */\n    .preheader { display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; }\n  </style>\n</head>\n<body style=\"margin:0; padding:0; background-color:#f2f4f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n\n  <!-- Preheader (inbox preview) -->\n  <div class=\"preheader\">{{ $('Merge With IDs').item.json.CV.Name }} — Strong {{ $('Merge With IDs').item.json.CV['Best Vacancy'] }} candidate ({{ $('Merge With IDs').item.json.CV.Score }} score). Summary and contact details inside.</div>\n\n  <!-- Main wrapper -->\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background-color:#f2f4f7; padding:24px 0;\">\n    <tr>\n      <td align=\"center\">\n\n        <!-- Container (max width) -->\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"container\" style=\"width:600px; max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.08);\">\n          <!-- Header -->\n          <tr>\n            <td style=\"padding:20px 24px; background: linear-gradient(90deg,#0f62fe 0%, #2bb673 100%); color:#ffffff;\">\n              <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr>\n                  <td style=\"vertical-align:middle;\">\n                    <h1 style=\"margin:0; font-size:20px; font-weight:600; font-family:inherit;\">Candidate Shortlist — {{ $('Merge With IDs').item.json.CV['Best Vacancy'] }}</h1>\n                    <div style=\"margin-top:6px; font-size:13px; opacity:0.95;\">High scoring candidate presented to HR</div>\n                  </td>\n                  <td align=\"right\" style=\"vertical-align:middle;\">\n                    <!-- small logo placeholder -->\n                    <div style=\"font-size:12px; line-height:1; background:rgba(255,255,255,0.12); padding:6px 10px; border-radius:6px;\">HR</div>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n          <!-- Content -->\n          <tr>\n            <td class=\"content\" style=\"padding:20px 24px;\">\n              <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr>\n                  <td style=\"padding-bottom:12px;\">\n                    <p style=\"margin:0; font-size:15px; color:#111827;\">Hello HR,</p>\n                    <p style=\"margin:12px 0 0 0; font-size:15px; color:#374151;\">We have a <strong>+90% score</strong> {{ $('Merge With IDs').item.json.CV['Best Vacancy'] }} candidate for your review.</p>\n                  </td>\n                </tr>\n\n                <!-- Candidate card (two columns) -->\n                <tr>\n                  <td style=\"padding-top:12px; padding-bottom:18px;\">\n                    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"border:1px solid #e6e9ee; border-radius:8px;\">\n                      <tr>\n                        <td style=\"padding:14px;\">\n                          <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                            <tr>\n                              <!-- Left column: details -->\n                              <td class=\"two-col\" valign=\"top\" style=\"width:70%; padding-right:12px;\">\n                                <p style=\"margin:0 0 8px 0; font-size:16px; font-weight:600; color:#0f1724;\">{{ $('Merge With IDs').item.json.CV.Name }}</p>\n\n                                <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" style=\"font-size:14px; color:#334155;\">\n                                  <tr>\n                                    <td style=\"padding:2px 0; vertical-align:top; width:84px;\"><strong>Phone:</strong></td>\n                                    <td style=\"padding:2px 0;\">{{ $('Merge With IDs').item.json.CV.Phone }}</td>\n                                  </tr>\n                                  <tr>\n                                    <td style=\"padding:2px 0; vertical-align:top;\"><strong>Email:</strong></td>\n                                    <td style=\"padding:2px 0;\"><a href=\"mailto:{{ $('Merge With IDs').item.json.CV.Email }}\" style=\"color:#0f62fe; text-decoration:none;\">{{ $('Merge With IDs').item.json.CV.Email }}</a></td>\n                                  </tr>\n                                  <tr>\n                                    <td style=\"padding:2px 0; vertical-align:top;\"><strong>Score:</strong></td>\n                                    <td style=\"padding:2px 0;\">{{ $('Merge With IDs').item.json.CV.Score }}</td>\n                                  </tr>\n                                </table>\n                              </td>\n\n                              <!-- Right column: score badge -->\n                              <td class=\"two-col\" valign=\"middle\" align=\"right\" style=\"width:30%; padding-left:12px;\">\n                                <div class=\"score-badge\" style=\"display:inline-block; background:#e6ffef; color:#0b6b3a; font-weight:700; border-radius:999px; padding:12px 18px; font-size:20px; min-width:86px; text-align:center;\">\n                                  {{ $('Merge With IDs').item.json.CV.Score }}\n                                </div>\n                                <div style=\"font-size:12px; color:#475569; margin-top:8px; text-align:right;\">Top-tier candidate</div>\n                              </td>\n                            </tr>\n                          </table>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n\n                <!-- Summary review -->\n                <tr>\n                  <td style=\"padding-top:6px; padding-bottom:18px;\">\n                    <h2 style=\"margin:0 0 8px 0; font-size:16px; font-weight:600; color:#0f1724;\">Summary Review</h2>\n                    <p style=\"margin:0; font-size:14px; color:#334155; line-height:1.55;\">\n                      {{ $('Merge With IDs').item.json.CV['Summary Review'] }}\n                    </p>\n                  </td>\n                </tr>\n\n                <!-- CTA / Actions -->\n                <tr>\n                  <td style=\"padding-top:6px; padding-bottom:20px;\">\n                    <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\">\n                      <tr>\n                        <td align=\"left\">\n                          <!-- Example action button (link to profile or interview booking) -->\n                          <a href=\"{{ $('Upload file').item.json.webViewLink }}\" style=\"display:inline-block; padding:11px 18px; background:#0f62fe; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:600; font-size:14px;\">View CV/Resume</a>\n                        </td>\n                        <td align=\"right\" style=\"font-size:13px; color:#68707a; padding-left:12px;\">\n                          <span style=\"display:inline-block; padding:8px 10px; border-radius:6px; background:#f3f4f6;\">Score verified</span>\n                        </td>\n                      </tr>\n                    </table>\n                  </td>\n                </tr>\n\n              </table>\n            </td>\n          </tr>\n\n          <!-- Footer -->\n          <tr>\n            <td style=\"padding:14px 24px; background:#fbfdff; border-top:1px solid #eef2f7; font-size:13px; color:#64748b;\">\n              <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr>\n                  <td>\n                    Thanks for your time,<br>\n                    <strong style=\"color:#0f1724;\">CV Automation Bot</strong>\n                  </td>\n                  <td align=\"right\" style=\"font-size:12px; color:#94a3b8;\">\n                    © <span id=\"year\">2025</span> Company Name\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "CV Automation System"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3808,
+        832
+      ],
+      "id": "9ded285e-278b-4ff8-b469-b381fc2f37f4",
+      "name": "Send a message2",
+      "webhookId": "e515aa04-bfda-430b-b408-b97f41124c2c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Yyj2Hr7r3ctVPUD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4904514097001688622"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        4016,
+        832
+      ],
+      "id": "2d33faa7-4f55-4819-a409-c2d933ebc0ec",
+      "name": "Add label to message1",
+      "webhookId": "a870a282-7ad7-44b2-9d59-34fe1e538bb3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Yyj2Hr7r3ctVPUD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Get New CV Emails",
+        "height": 624,
+        "width": 656,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3504,
+        736
+      ],
+      "id": "ec081a1e-b8ef-4f73-a5ca-5a2f76170456",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "# Add File to Need to Review",
+        "height": 304,
+        "width": 1088
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        1360
+      ],
+      "id": "b20853fe-8df3-460b-9a60-0181fc65988a",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "sendTo": "mohammedadellma224@gmail.com",
+        "subject": "Daily New Candidates Report",
+        "message": "=<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>Daily CV Summary</title>\n  <style>\n    @media only screen and (max-width: 620px) {\n      .container { width: 100% !important; padding: 16px !important; }\n      .content { padding: 18px !important; }\n      .btn { display:block !important; width:100% !important; text-align:center !important; }\n    }\n    .preheader { display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; }\n  </style>\n</head>\n<body style=\"margin:0; padding:0; background-color:#f2f4f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\">\n\n  <!-- Preheader -->\n  <div class=\"preheader\">Today’s CV summary with candidates scoring above 70% is ready for review.</div>\n\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background-color:#f2f4f7; padding:24px 0;\">\n    <tr>\n      <td align=\"center\">\n\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"container\" style=\"width:600px; max-width:600px; background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.08);\">\n          \n          <!-- Header -->\n          <tr>\n            <td style=\"padding:20px 24px; background: linear-gradient(90deg,#0f62fe 0%, #2bb673 100%); color:#ffffff;\">\n              <h1 style=\"margin:0; font-size:20px; font-weight:600;\">Daily CV Summary</h1>\n              <div style=\"margin-top:6px; font-size:13px; opacity:0.95;\">Candidates scoring above 70%</div>\n            </td>\n          </tr>\n\n          <!-- Content -->\n          <tr>\n            <td class=\"content\" style=\"padding:20px 24px;\">\n              <p style=\"margin:0; font-size:15px; color:#111827;\">Hello Manager,</p>\n              <p style=\"margin:12px 0 20px 0; font-size:15px; color:#374151;\">\n                Here is today’s CV summary containing all candidates who achieved a <strong>score above 70%</strong>.\n              </p>\n\n              <!-- Button -->\n              <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\" style=\"margin-bottom:20px;\">\n                <tr>\n                  <td>\n                    <a href=\"{{ $('Create Today Report Spreadsheet').item.json.spreadsheetUrl }}\" class=\"btn\" \n                       style=\"display:inline-block; padding:12px 22px; background:#0f62fe; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:600; font-size:15px;\">\n                      View Spreadsheet\n                    </a>\n                  </td>\n                </tr>\n              </table>\n\n              <p style=\"margin:0; font-size:14px; color:#334155;\">\n                Please review the shortlisted candidates at your convenience.\n              </p>\n            </td>\n          </tr>\n\n          <!-- Footer -->\n          <tr>\n            <td style=\"padding:14px 24px; background:#fbfdff; border-top:1px solid #eef2f7; font-size:13px; color:#64748b;\">\n              <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                <tr>\n                  <td>\n                    Thanks for your time,<br>\n                    <strong style=\"color:#0f1724;\">CV Automation Bot</strong>\n                  </td>\n                  <td align=\"right\" style=\"font-size:12px; color:#94a3b8;\">\n                    © <span id=\"year\">2025</span> Company Name\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "HR"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2112,
+        1856
+      ],
+      "id": "44aa901f-325e-4959-9609-84751eb67c6b",
+      "name": "Send Daily Report to Manager",
+      "webhookId": "e515aa04-bfda-430b-b408-b97f41124c2c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Yyj2Hr7r3ctVPUD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f442d481-8f49-4529-a152-e5cd48e289ee",
+              "leftValue": "={{ $json.Score }}",
+              "rightValue": 0.7,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        1856
+      ],
+      "id": "bd38c023-959b-4b33-bfec-c6ace516a42c",
+      "name": "Filter +70% Score"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "Today Report",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        1856
+      ],
+      "id": "3f784605-ad20-498c-92b9-787e03ae210b",
+      "name": "Create Today Report Spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $('Create Today Report Spreadsheet').item.json.spreadsheetId }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"requests\": [\n        {\n            \"addTable\": {\n                \"table\": {\n                    \"name\": \"CVs\",\n                    \"range\": {\n                      \"endColumnIndex\": 8\n                    },\n                    \"columnProperties\": [\n                        {\n                          \"columnIndex\": 0,\n                          \"columnName\": \"Name\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 1,\n                          \"columnName\": \"Phone\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 2,\n                          \"columnName\": \"Email\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 3,\n                          \"columnName\": \"Title\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 4,\n                          \"columnName\": \"Best Vacancy\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 5,\n                          \"columnName\": \"Score\",\n                          \"columnType\": \"PERCENT\"\n                        },\n                        {\n                          \"columnIndex\": 6,\n                          \"columnName\": \"Summary Review\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 7,\n                          \"columnName\": \"CV Link\",\n                          \"columnType\": \"TEXT\"\n                        }\n                    ]\n                }\n            }\n        },\n      {\n          \"repeatCell\": {\n            \"range\": {\n              \"startRowIndex\": 1,\n              \"endColumnIndex\": 8\n            },\n            \"cell\": {\n              \"userEnteredFormat\": {\n                \"verticalAlignment\": \"TOP\"\n              }\n            },\n            \"fields\": \"userEnteredFormat(verticalAlignment)\"\n          }\n      },\n      {\n        \"repeatCell\": {\n          \"range\": {\n            \"startRowIndex\": 1,\n            \"startColumnIndex\": 6,\n            \"endColumnIndex\": 8\n          },\n          \"cell\": {\n            \"userEnteredFormat\": {\n              \"wrapStrategy\": \"WRAP\"\n            }\n          },\n          \"fields\": \"userEnteredFormat(wrapStrategy)\"\n        }\n      },\n      {\n        \"updateDimensionProperties\": {\n          \"range\": {\n              \"dimension\": \"COLUMNS\",\n              \"startIndex\": 6,  \n              \"endIndex\": 7\n          },\n          \"properties\": {\n              \"pixelSize\": 350\n          },\n          \"fields\": \"pixelSize\"\n        }\n      }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1024,
+        1856
+      ],
+      "id": "33f7cc2f-27b8-46fd-8bce-5b3a3d5a7336",
+      "name": "Format Spreadsheet Table",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "CVs",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1200,
+        496
+      ],
+      "id": "8a0aedbc-5dc5-4b44-9881-30188f75053f",
+      "name": "Create CVs Spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Create CVs Spreadsheet').item.json.spreadsheetId }}"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create Today Folder').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1456,
+        496
+      ],
+      "id": "2cb401bb-3e58-480b-a7d4-9ac6bf173975",
+      "name": "Move CVs Spreadsheet to Today Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "xJPJagsQIKXc95f5",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $('Create CVs Spreadsheet').item.json.spreadsheetId }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n    \"requests\": [\n        {\n            \"addTable\": {\n                \"table\": {\n                    \"name\": \"CVs\",\n                    \"range\": {\n                      \"endColumnIndex\": 8\n                    },\n                    \"columnProperties\": [\n                        {\n                          \"columnIndex\": 0,\n                          \"columnName\": \"Name\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 1,\n                          \"columnName\": \"Phone\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 2,\n                          \"columnName\": \"Email\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 3,\n                          \"columnName\": \"Title\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 4,\n                          \"columnName\": \"Best Vacancy\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 5,\n                          \"columnName\": \"Score\",\n                          \"columnType\": \"PERCENT\"\n                        },\n                        {\n                          \"columnIndex\": 6,\n                          \"columnName\": \"Summary Review\",\n                          \"columnType\": \"TEXT\"\n                        },\n                        {\n                          \"columnIndex\": 7,\n                          \"columnName\": \"CV Link\",\n                          \"columnType\": \"TEXT\"\n                        }\n                    ]\n                }\n            }\n        },\n      {\n          \"repeatCell\": {\n            \"range\": {\n              \"startRowIndex\": 1,\n              \"endColumnIndex\": 8\n            },\n            \"cell\": {\n              \"userEnteredFormat\": {\n                \"verticalAlignment\": \"TOP\"\n              }\n            },\n            \"fields\": \"userEnteredFormat(verticalAlignment)\"\n          }\n      },\n      {\n        \"repeatCell\": {\n          \"range\": {\n            \"startRowIndex\": 1,\n            \"startColumnIndex\": 6,\n            \"endColumnIndex\": 8\n          },\n          \"cell\": {\n            \"userEnteredFormat\": {\n              \"wrapStrategy\": \"WRAP\"\n            }\n          },\n          \"fields\": \"userEnteredFormat(wrapStrategy)\"\n        }\n      },\n      {\n        \"updateDimensionProperties\": {\n          \"range\": {\n              \"dimension\": \"COLUMNS\",\n              \"startIndex\": 6,  \n              \"endIndex\": 7\n          },\n          \"properties\": {\n              \"pixelSize\": 350\n          },\n          \"fields\": \"pixelSize\"\n        }\n      }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1664,
+        496
+      ],
+      "id": "c310bd6f-fd1e-4828-8e48-3e6650c28ee2",
+      "name": "Format CVs Spreadsheet Table",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "D7xk8OMfnIsELAdH",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch - File Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Text Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Today Folder": {
+      "main": [
+        [
+          {
+            "node": "Create CVs Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create CVs Folder": {
+      "main": [
+        [
+          {
+            "node": "Create Need to Review Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Format Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Report to Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge CV with Data": {
+      "main": [
+        [
+          {
+            "node": "Get Today Files IDs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge With IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create Today Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Get a Vacancies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Extracted Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a Vacancies": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extracted Data": {
+      "main": [
+        [
+          {
+            "node": "Merge CV with Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Format Row": {
+      "main": [
+        [
+          {
+            "node": "Append to CVs Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get Today Files IDs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter +70% Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Today Files IDs1": {
+      "main": [
+        [
+          {
+            "node": "Create Today Report Spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Spreadsheet to Today Folder1": {
+      "main": [
+        [
+          {
+            "node": "Format Spreadsheet Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge With IDs": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - File Type": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Do Nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DOCX to Text",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Do Nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Today Files IDs2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Do Nothing": {
+      "main": [
+        [
+          {
+            "node": "Merge CV with Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Content": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Today Files IDs": {
+      "main": [
+        [
+          {
+            "node": "Merge With IDs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create Need to Review Folder": {
+      "main": [
+        [
+          {
+            "node": "Create CVs Spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOCX to Text": {
+      "main": [
+        [
+          {
+            "node": "Text Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Today Files IDs2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Upload to Need to Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Need to Review": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to CVs Database": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter +70% Score": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Today Report Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Move Spreadsheet to Today Folder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Spreadsheet Table": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create CVs Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Move CVs Spreadsheet to Today Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move CVs Spreadsheet to Today Folder": {
+      "main": [
+        [
+          {
+            "node": "Format CVs Spreadsheet Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format CVs Spreadsheet Table": {
+      "main": [
+        [
+          {
+            "node": "Append to Files IDs Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6bb62323-1a94-4a98-9fa1-29d62ec99fd3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a7764749b1da72de2c057dd378204931eda1ea49be8a5119c4ea43fd488c56b7"
+  },
+  "id": "qWw7o0iT6B7sgNHX",
+  "tags": []
+}
