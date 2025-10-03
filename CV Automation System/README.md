@@ -1,4 +1,6 @@
 # CV Automation System
+Download Workflow [⬇️](https://github.com/MohammedAdel224/n8n/blob/main/CV%20Automation%20System/CV%20Automation%20System.zip)  
+
 ![Workflow Screenshot](https://github.com/MohammedAdel224/n8n/blob/main/CV%20Automation%20System/Workflow.png)
 
 ## What does this workflow do?
@@ -19,9 +21,9 @@
       * `Daily Reports Files IDs` Sheets file
       * `Vacancies` Docs file
 * Prepare Credentials
-  * From Google Console Cloud, get your client secret and client id. [See How](https://youtu.be/vsHnStTN4x8)
+  * From Google Console Cloud, get your client secret and client id. [Watch How 🎦](https://youtu.be/vsHnStTN4x8)
   * From Google Console Cloud, enable Gmail, Drive, Sheets and Docs APIs
-  * From Google AI Studio, get your Gemini API key. [See How](https://youtu.be/DCWAdPqf0hw)
+  * From Google AI Studio, get your Gemini API key. [Watch How 🎦](https://youtu.be/DCWAdPqf0hw)
 
 ## Watch the video
 [![How to create a simple CV automation system using n8n](https://img.youtube.com/vi/8e1aihq_4LY/0.jpg)](https://www.youtube.com/watch?v=8e1aihq_4LY)
