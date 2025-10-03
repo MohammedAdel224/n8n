@@ -1,5 +1,5 @@
 # CV Automation System
-Download Workflow [⬇️](https://github.com/MohammedAdel224/n8n/blob/main/CV%20Automation%20System/CV%20Automation%20System.zip)  
+Download Workflow [⬇️](https://github.com/MohammedAdel224/n8n/raw/main/CV%20Automation%20System/CV%20Automation%20System.zip)  
 
 ![Workflow Screenshot](https://github.com/MohammedAdel224/n8n/blob/main/CV%20Automation%20System/Workflow.png)
 
