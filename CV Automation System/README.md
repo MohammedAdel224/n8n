@@ -20,6 +20,7 @@
       * `Vacancies` Docs file
 * Prepare Credentials
   * From Google Console Cloud, get your client secret and client id. [See How](https://youtu.be/vsHnStTN4x8)
+  * From Google Console Cloud, enable Gmail, Drive, Sheets and Docs APIs
   * From Google AI Studio, get your Gemini API key. [See How](https://youtu.be/DCWAdPqf0hw)
 
 ## Watch the video
